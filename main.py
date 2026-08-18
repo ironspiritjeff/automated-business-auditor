@@ -7,7 +7,7 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# Endpoint #1: Set up the GET skeleton to run a system health check
+# Endpoint 1: Set up the GET skeleton to run a system health check
 
 
 @app.get("/health", tags=["System"])
@@ -19,8 +19,9 @@ def health_check():
         "environment": "development"
     }
 
-
 # Endpoint 2: Set up the POST skeleton for document uploading
+
+
 @app.post("/audit/upload", tags=["Auditor Core"])
 def check_doc_upload(filename: str, department: str):
     '''This simulates receiving metadata before attaching the AI processing engine'''
