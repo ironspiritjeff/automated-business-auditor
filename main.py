@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi import HTTPException
 
 app = FastAPI(title="Automated Business Auditor")
 
@@ -32,6 +33,12 @@ MOCK_DATABASE = [
 async def list_documents():
     return MOCK_DATABASE
 
+@app.get("/audit/documents/{filename}")
+async def get_document(filename: str):
+    for doc in MOCK_DATABASE:
+        if doc["filename"] == filename:
+            return doc
+    raise HTTPException(status_code=404, detail="Document not found")
 
 
 # Endpoint 1 (Health status check): http://127.0.0.1:8000/health
