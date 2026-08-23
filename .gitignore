@@ -1,5 +1,11 @@
-.env
-__pycache__/
+# Exclude all python compilation caches globally in any subdirectory
+*__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb_checkpoints/
+
+
+# Exclude localized environment configurations
 .venv/
-*.pyc 
-.ipynb_checkpoints/
+.env
