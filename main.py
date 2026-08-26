@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi import HTTPException
+import logging
 
 app = FastAPI(title="Automated Business Auditor")
 
+logging.basicConfig(level = logging.INFO)
+logger = logging.getLogger("app_logger")
 
 class SimpleUploadRequest(BaseModel):
     filename: str
@@ -21,8 +24,14 @@ async def check_health():
 
 @app.post("/audit/upload")
 async def stage_document(payload: SimpleUploadRequest):
-    #Enforce that file must be a PDF
+    '''
+    Validate and stage incoming corporate assets into the data pipeline
+    '''
+    logger.info(f"Received upload request for file {payload.filename}")
+
+    # Enforce data ingestion constraints: only allow PDF files to be staged
     if not payload.filename.lower().endswith(".pdf"):
+        logger.warning(f"rejected non-PDF file upload attempt: {payload.filename}")
         raise HTTPException(status_code = 400, detail = "Only PDF files are allowed for upload.")
     return {
         "message": f"Document '{payload.filename}' has been safely staged.",
@@ -55,3 +64,7 @@ async def get_document(filename: str):
     # To test: Invoke-RestMethod -Uri "http://127.0.0.1:8000/audit/upload" -Method Get
 # Endpoint 3 (Document pipeline upload POST): http://http://127.0.0.1:8000/audit/upload
     # To test: Invoke-RestMethod -Uri "http://127.0.0.1:8000/audit/upload" -Method Post
+
+
+#$BadData = @{ filename = "malicious_report.docx"; character_count = 12000 } | ConvertTo-Json
+# Invoke-RestMethod -Uri "http://127.0.0.1:8000/audit/upload" -Method Post -Body $BadData -ContentType "application/json"
