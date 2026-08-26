@@ -4,9 +4,11 @@ from fastapi import HTTPException
 
 app = FastAPI(title="Automated Business Auditor")
 
+
 class SimpleUploadRequest(BaseModel):
     filename: str
     character_count: int
+
 
 @app.get("/health")
 async def check_health():
@@ -16,8 +18,12 @@ async def check_health():
         "tier": "development"
     }
 
+
 @app.post("/audit/upload")
 async def stage_document(payload: SimpleUploadRequest):
+    #Enforce that file must be a PDF
+    if not payload.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code = 400, detail = "Only PDF files are allowed for upload.")
     return {
         "message": f"Document '{payload.filename}' has been safely staged.",
         "processed_characters": payload.character_count,
@@ -25,13 +31,16 @@ async def stage_document(payload: SimpleUploadRequest):
     }
 
 MOCK_DATABASE = [
-    {"filename": "q4_walkthrough.pdf", "character_count": 45000, "status": "completed"},
+    {"filename": "q4_walkthrough.pdf",
+        "character_count": 45000, "status": "completed"},
     {"filename": "travel_policy.pdf", "character_count": 120000, "status": "processing"}
 ]
+
 
 @app.get("/audit/documents")
 async def list_documents():
     return MOCK_DATABASE
+
 
 @app.get("/audit/documents/{filename}")
 async def get_document(filename: str):
@@ -43,7 +52,6 @@ async def get_document(filename: str):
 
 # Endpoint 1 (Health status check): http://127.0.0.1:8000/health
 # Endpoint 2 (Staged documents list query): http://127.0.0.1:8000/audit/documents
-        # To test: Invoke-RestMethod -Uri "http://127.0.0.1:8000/audit/upload" -Method Get
+    # To test: Invoke-RestMethod -Uri "http://127.0.0.1:8000/audit/upload" -Method Get
 # Endpoint 3 (Document pipeline upload POST): http://http://127.0.0.1:8000/audit/upload
     # To test: Invoke-RestMethod -Uri "http://127.0.0.1:8000/audit/upload" -Method Post
-
