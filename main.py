@@ -50,7 +50,12 @@ async def stage_document(payload: SimpleUploadRequest):
     return {
         "message": f"Document '{payload.filename}' has been safely staged.",
         "processed_characters": payload.character_count,
-        "status": "staged"
+        "status": "staged",
+        "mcp_routing": {
+            "tool_exposed": True,
+            "agent_visibility": "public",
+            "require_approval": "never"
+        }
     }
 
 MOCK_DATABASE = [
